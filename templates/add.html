@@ -23,7 +23,7 @@ Dashboard
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right">
-            <li><a href="{{url_for('getCart')}}">Cart({{session['IssueCart']|length}})</a></li>
+            <li><a class = "nav-link-disabled" href="{{url_for('getCart')}}">Cart({{session['IssueCart']|length}})</a></li>
             <li><a href="{{url_for('history')}}">History</a></li>
             <li><a href="{{url_for('new_book')}}">Insert Book</a></li>
             <li><a href="{{ url_for('account') }}">Profile</a></li>
@@ -41,54 +41,26 @@ Dashboard
             <li><a href="#">Analytics</a></li>
             <li><a href="#">Export</a></li>
         </div>
-        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-          <h1 class="page-header">Welcome,{{ name }}</h1>
-          <h2 class="sub-header">Section title</h2>
-          
-          <h3>Books:</h3>
-          <form method="POST" role="search">
-            <input type="text" class="form-control" placeholder="Search... " name="search" >
-            <button type="submit" class="btn btn-primary">Search  </button>
-          </form>
-          <table class ='table table-hover' style="margin-left:20px">
-            <th>
-                <tr style="color:black">
-              <th>Title</th>
-              <th>Author</th>
-              <th>Publications</th>
-              <th>Year</th>
-              <th>ISBN Number</th>
-              <th>Quantity</th>
-                </tr>
-            </th>
-            <tr>
-              {%for Books in query %}
-              <tr>
-              <td>
-                <a href="{{url_for('cart',id=Books.id)}}">{{Books.title}}</a>
-              </td>
-              <td>
-                {{Books.author}}
-              </td>
-              <td>
-                {{Books.publications}}
-              </td>
-              <td>
-                {{Books.year}}
-              </td>
-              <td>
-                {{Books.isbn}}
-              </td>
-              <td>
-                {{Books.quantity}}
-              </td>
-              <td>
+        <div class="col-md-6" id="b_image">
+            <img src="{{url_for('static',filename='images/Finance')}}" width="400" height="400">
+        </div>
+         <div class="col-md-6">
+            <h4>Book name: {{book_name.title}} </h4>
+            <hr>
+            <h4>Book ISBN: {{book_name.isbn}} </h4>
+            <hr>
+            <h4>Book Author: {{book_name.author}} </h4>
+            <hr>
+            <h4>Book Quantity: {{book_name.quantity}} </h4>
+            <hr>
+            <form action="{{url_for('AddCart')}}" method="post">
+                <input type="hidden" name="book_name_id" value="{{book_name.id}}">
+                <button type="submit" class="btn btn-sm btn-warning">Add to Cart</button>
                 
-            </tr>
-              {%endfor%}
-            </tr>
+            </form>
+        
+        </div>
 
-          </table>
         </div>
       </div>
     </div>

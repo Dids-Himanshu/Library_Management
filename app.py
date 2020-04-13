@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for,flash,request
+from flask import Flask, render_template, redirect, url_for,flash,request,session
 from flask_login import current_user
 from flask_bootstrap import Bootstrap
 from flask_wtf import FlaskForm 
@@ -168,25 +168,58 @@ def new_book():
         return redirect(url_for('new_book'))
     return render_template('insert_book.html',title='New Book',form=form)
 
+@app.route('/book/<int:id>')
+def cart(id):
+    book_name = Books.query.get_or_404(id) 
+    return render_template('add.html',book_name=book_name)
+
+@app.route('/carts')
+@login_required
+def getCart():
+    if 'IssueCart' not in session:
+        return redirect(request.referrer)
+    else:
+        return render_template('cart.html')
+
+
+
+
+
+
+
+def MergerDicts(dict1,dict2):
+    if isinstance(dict1,list) and isinstance(dict2,list):
+        return dict1+dict2
+    elif isinstance(dict1,dict) and isinstance(dict2,dict):
+        return dict(list(dict1.items())+list(dict2.items()))
+    return False 
+
+@app.route('/Add',methods=['POST'])
+def AddCart():
+    try:
+        book_name_id = request.form.get('book_name_id')
+        book_name =Books.query.filter_by(id=book_name_id).first()
+        if book_name_id and request.method=='POST':
+            DictBook = {book_name_id:{'title':book_name.title,'author':book_name.author,'isbn':book_name.isbn,'year':book_name.year,'publications':book_name.publications}}
+            if 'IssueCart' in session:
+                if book_name_id in session['IssueCart']:
+                    print('This book is already in your cart')
+                else:
+                    session['IssueCart'] = MergerDicts(session['IssueCart'],DictBook)
+                    return redirect(request.referrer)
+            else:
+                session['IssueCart'] = DictBook
+                return redirect(request.referrer)
+    except Exception as e:
+        print(e)
+    finally:
+        return redirect(request.referrer)
+
 @app.route('/dashboard',methods=['GET','POST'])
 @login_required
 def dashboard():
     form=SearchForm()
-    if request.method=='POST':
-        update=Books.query.filter_by(id=Books.id.data).update(dict(quantity=Books.quantity-1))
-        db.session.commit()
     return render_template('dashboard.html',form=form, name=current_user.username,query=Books.query.all(),search=form.search.data)
-
-# @pp.route('/cart',methods=['POST'])
-# def AddToCart():
-#     try:
-#         pass
-#     except expression as identifier:
-#         pass
-#     else:
-#         pass
-#     finally:
-#         pass
 
 
 @app.route('/history')
